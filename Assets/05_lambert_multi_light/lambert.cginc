@@ -42,6 +42,8 @@ v2f vert (appdata_tan v)
     // インスペクタで指定したTiling/Offsetを反映させる
     o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
+    // ライト情報をフラグメントシェーダに渡すための処理を行う
+    // 座標空間の変換等をライトの種類に応じて行っている模様
     TRANSFER_VERTEX_TO_FRAGMENT(o);
 
     return o;
