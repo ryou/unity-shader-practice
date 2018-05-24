@@ -134,21 +134,43 @@ Shader "05/lambert_multi_light"
             #include "UnityCG.cginc"
             #include "AutoLight.cginc"
 
+
+            /**************************************
+            Propertiesで宣言した変数を使用するための宣言
+            ***************************************/
+            sampler2D _MainTex;
+
+
+            /**************************************
+            その他変数宣言
+            ***************************************/
+            fixed4 _LightColor0;
+
+
+            /**************************************
+            構造体定義
+            ***************************************/
             struct v2f {
                 float4 pos : SV_POSITION;
                 float2 uv  : TEXCOORD0;
-                float3 lightDir : TEXCOORD2;
-                float3 normal   : TEXCOORD1;
-                LIGHTING_COORDS(3, 4)
+                float3 lightDir : TEXCOORD1;
+                float3 normal   : NORMAL;
+                LIGHTING_COORDS(2, 3)
             };
 
-            v2f vert(appdata_tan v) {
+
+            /**************************************
+            シェーダ処理
+            ***************************************/
+            // TODO: ここでappdata_tanを使用する理由に関して調査が必要
+            v2f vert(appdata_tan v)
+            {
                 v2f o;
 
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = v.texcoord.xy;
 
-                o.lightDir = ObjSpaceLightDir(v.vertex);
+                o.lightDir = normalize(ObjSpaceLightDir(v.vertex));
 
                 o.normal = v.normal;
                 TRANSFER_VERTEX_TO_FRAGMENT(o);
@@ -156,21 +178,16 @@ Shader "05/lambert_multi_light"
                 return o;
             }
 
-            sampler2D _MainTex;
-            fixed4 _LightColor0;
-
-            fixed4 frag(v2f i) : COLOR {
-                i.lightDir = normalize(i.lightDir);
+            fixed4 frag(v2f i) : SV_Target
+            {
                 fixed atten = LIGHT_ATTENUATION(i);
-                fixed4 tex = tex2D(_MainTex, i.uv);
-                fixed3 normal = i.normal;
-                fixed diff = saturate(dot(normal, i.lightDir));
+                // saturate: https://msdn.microsoft.com/ja-jp/library/bb509645(v=vs.85).aspx
+                fixed diff = saturate(dot(i.normal, i.lightDir));
 
-                fixed4 c;
-                c.rgb = (tex.rgb * _LightColor0.rgb * diff) * (atten * 2);
-                c.a = tex.a;
+                fixed4 color = tex2D(_MainTex, i.uv);
+                color.rgb *= _LightColor0.rgb * diff * atten;
 
-                return c;
+                return color;
             }
 
             ENDCG
