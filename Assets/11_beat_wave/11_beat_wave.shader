@@ -50,6 +50,7 @@
             {
                 float4 vertex : POSITION; // 頂点位置
                 float2 texcoord : TEXCOORD0; // テクスチャ座標
+                float4 normal : NORMAL;
             };
 
             struct v2f
@@ -80,7 +81,10 @@
                 // クリップスペースへの変換位置
                 // (モデル*ビュー*プロジェクション行列で乗算)
                 // (SV_POSITION（今回の場合o.vertex）は、fragmentシェーダで使用しない場合でも返り値に含める必要があるっぽい)
-                float rad = atan2(v.vertex.y, v.vertex.x);
+
+                float lengthXZ = length(float3(v.vertex.x, 0, v.vertex.z)); // xz平面上における長さ
+                float lengthY = abs(v.vertex.y);
+                float rad = atan2(lengthXZ, lengthY);
                 float rand1 = floor((_Seed * floor(_Time.w)) % 100);
                 float a = sin(rad*rand1 * 10) + sin(rad*rand1);
                 a = a * 0.5 + 0.5;
