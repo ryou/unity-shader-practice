@@ -4,9 +4,9 @@
     // https://docs.unity3d.com/jp/current/Manual/SL-Properties.html
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
         _Seed ("Seed", Range(1000, 10000)) = 1000
         _Distortion ("Distortion", Range(0, 1)) = 0.5
+        _BeatSpeed("Beat Speed", Float) = 1.0
     }
     SubShader
     {
@@ -30,9 +30,9 @@
             /**************************************
             Propertiesで宣言した変数を使用するための宣言
             ***************************************/
-            sampler2D _MainTex;
             float _Seed;
             float _Distortion;
+            float _BeatSpeed;
 
 
             /**************************************
@@ -49,13 +49,10 @@
             struct appdata
             {
                 float4 vertex : POSITION; // 頂点位置
-                float2 texcoord : TEXCOORD0; // テクスチャ座標
-                float4 normal : NORMAL;
             };
 
             struct v2f
             {
-                float2 uv : TEXCOORD0; // テクスチャ座標
                 float4 vertex : SV_POSITION; // クリップスペース位置
             };
 
@@ -78,35 +75,33 @@
             {
                 v2f o;
 
-                // クリップスペースへの変換位置
-                // (モデル*ビュー*プロジェクション行列で乗算)
-                // (SV_POSITION（今回の場合o.vertex）は、fragmentシェーダで使用しない場合でも返り値に含める必要があるっぽい)
-
+                // y軸に対し成す角を算出
                 float lengthXZ = length(float3(v.vertex.x, 0, v.vertex.z)); // xz平面上における長さ
                 float lengthY = abs(v.vertex.y);
                 float rad = atan2(lengthXZ, lengthY);
-                float rand1 = floor((_Seed * floor(_Time.w)) % 100);
-                float a = sin(rad*rand1 * 10) + sin(rad*rand1);
+
+                // 頂点変形
+                float currentTime = _Time.w * _BeatSpeed;
+                float seed = _Seed * floor(currentTime);
+                float a = sin(rad * seed * 10) + sin(rad * seed);
                 a = a * 0.5 + 0.5;
                 v.vertex *= 1 + (a * _Distortion);
 
-                float2 bezierVal = bezier(float2(0, 0), float2(0.01, 2), float2(100000, 0), _Time.w % 1);
+                // ビートを刻む処理
+                float2 bezierVal = bezier(float2(0, 0), float2(0.01, 2), float2(100000, 0), currentTime % 1);
                 v.vertex *= bezierVal.y;
 
+                // クリップスペースへの変換位置
+                // (モデル*ビュー*プロジェクション行列で乗算)
+                // (SV_POSITION（今回の場合o.vertex）は、fragmentシェーダで使用しない場合でも返り値に含める必要があるっぽい)
                 o.vertex = UnityObjectToClipPos(v.vertex);
-
-                // インスペクタで指定したTiling/Offsetを反映させる
-                o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // テクスチャをサンプリングして、それを返します
-                fixed4 color = tex2D(_MainTex, i.uv);
-
-                return fixed4(1.4, 1.4, 1.4, 0.7);
+                return fixed4(1, 1, 1, 1);
             }
             ENDCG
         }
