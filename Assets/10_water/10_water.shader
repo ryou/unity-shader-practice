@@ -10,13 +10,15 @@
         _NormalTex  ("Normal Tex", 2D   ) = "bump" {}
         _Distortion ("Distortion", Range(0, 10)) = 1
         _Flow ("Flow Rate", Range(0, 10)) = 1
+
+        _Color ("Color", Color) = (1, 1, 1, 1)
     }
 
     SubShader
     {
         Tags
         {
-            "Queue"      = "Transparent"
+            "Queue"      = "Transparent+1"
             "RenderType" = "Transparent"
         }
 
@@ -31,6 +33,7 @@
             sampler2D _NormalTex;
             float _Distortion;
             float _Flow;
+            fixed3 _Color;
 
             struct Input
             {
@@ -51,7 +54,7 @@
                 fixed3 grab = tex2D(_GrabTexture, grabUV).rgb;
 
                 o.Emission = grab;
-                o.Albedo   = fixed3(0, 0, 0);
+                o.Albedo   = _Color;
             }
         ENDCG
     }
