@@ -12,6 +12,10 @@
         _Flow ("Flow Rate", Range(0, 10)) = 1
 
         _Color ("Color", Color) = (1, 1, 1, 1)
+
+        _LightDir ("Light Direction", Vector) = (10, -5, 10, 0)
+        _SpecularPow ("Specular Pow", Int) = 100
+        _SpecularIntensity ("Specular Intensity", Range(0, 1)) = 1
     }
 
     SubShader
@@ -34,27 +38,44 @@
             float _Distortion;
             float _Flow;
             fixed3 _Color;
+            int _SpecularPow;
+            float _SpecularIntensity;
+            float4 _LightDir;
 
             struct Input
             {
                 float2 uv_NormalTex;
                 float4 screenPos;
+
+                float3 viewDir;
+                float3 worldNormal;
             };
 
             void surf (Input IN, inout SurfaceOutputStandard o)
             {
                 float2 grabUV = (IN.screenPos.xy / IN.screenPos.w);
-                
                 float2 normalUV = IN.uv_NormalTex;
                 normalUV += _Time.x * _Flow;
                 half4 normalColor = tex2D(_NormalTex, normalUV);
-                fixed2 normalTex = UnpackNormal(normalColor).rg;
+                normalUV.y += 0.1;
+                half4 normalColor2 = tex2D(_NormalTex, normalUV + _Time.x*1.1 *_Flow);
+                // 波のランダム感を出すために２つ足す
+                normalColor = (normalColor + normalColor2) *0.5;
+
+                float3 normal = UnpackNormal(normalColor);
+                fixed2 normalTex = normal.rg;
                 grabUV += normalTex * _Distortion;
 
                 fixed3 grab = tex2D(_GrabTexture, grabUV).rgb;
 
                 o.Emission = grab;
                 o.Albedo   = _Color;
+
+                // 反射の計算
+                float3 halfVec = normalize(normalize(_LightDir.xyz) + normalize(IN.viewDir));
+                float specular = saturate(dot(halfVec, normal));
+                specular = saturate(pow(specular, _SpecularPow));
+                o.Emission += specular * _SpecularIntensity;
             }
         ENDCG
     }
