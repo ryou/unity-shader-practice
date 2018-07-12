@@ -27,7 +27,7 @@
         }
 
         GrabPass {}
-        
+
         CGPROGRAM
             #pragma target 3.0
             #pragma surface surf Standard fullforwardshadows
@@ -70,16 +70,12 @@
 
                 o.Emission = grab;
                 o.Albedo   = _Color;
-                //o.Albedo = fixed3(normal.r, normal.b, normal.g);
-                normal = float3(normal.g, normal.b, normal.r);
 
                 // 反射の計算
-                ///*
                 float3 halfVec = normalize(normalize(_LightDir.xyz) + normalize(IN.viewDir));
                 float specular = saturate(dot(halfVec, normal));
                 specular = saturate(pow(specular, _SpecularPow));
                 o.Emission += specular * _SpecularIntensity;
-                //*/
             }
         ENDCG
     }
