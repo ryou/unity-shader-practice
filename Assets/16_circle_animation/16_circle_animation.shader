@@ -11,6 +11,10 @@ Shader "16/circle_animation"
         _Diameter ("Diameter", Float) = 0.5
         _Width ("Width", Float) = 0.1
         _Length ("Length", Float) = 3.14
+
+        _RotationSpeed ("Rotation Speed", Float) = 1.0
+        _Distortion ("Distortion", Float) = 1.0
+        _DistortionInterval ("Distortion Interval", Float) = 1.0
     }
     SubShader
     {
@@ -19,7 +23,7 @@ Shader "16/circle_animation"
             "Queue" = "Transparent"
             "RenderMode" = "Transparent"
         }
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend SrcAlpha One
         ZWrite Off
 
         Pass
@@ -43,9 +47,12 @@ Shader "16/circle_animation"
             Propertiesで宣言した変数を使用するための宣言
             ***************************************/
             fixed4 _Color;
-            float _Diameter;
-            float _Width;
-            float _Length;
+            fixed _Diameter;
+            fixed _Width;
+            fixed _Length;
+            fixed _RotationSpeed;
+            fixed _Distortion;
+            fixed _DistortionInterval;
 
             static const float PI = 3.14159265f;
 
@@ -80,7 +87,7 @@ Shader "16/circle_animation"
                 o.vertex = UnityObjectToClipPos(v.vertex);
 
                 // 回転を設定
-                float angle = _Time.z * 1.5;
+                float angle = _Time.z * _RotationSpeed;
                 // 回転行列
                 float2x2 rotate = float2x2(cos(angle), -sin(angle), sin(angle), cos(angle));
                 // 回転UVを設定
@@ -105,10 +112,10 @@ Shader "16/circle_animation"
                 {
                     float2 coord = uv - 0.5;
                     float rad = atan2(coord.y, coord.x) + PI;
-                    _Length += sin(_Time.z * 1.1);
+                    _Length += sin(_Time.z * _DistortionInterval) * _Distortion;
                     if (rad < _Length)
                     {
-                        color.a = 0.5;
+                        color.a = 0.45;
                     }
                 }
 

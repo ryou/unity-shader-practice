@@ -59,6 +59,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _Diameter: 0.9
+    - _DistortionInterval: 0.42
     - _DstBlend: 0
     - _FadeInEnd: 0.671
     - _FadeInStart: 0.575
@@ -72,6 +73,7 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
+    - _RotationSpeed: 0.79
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -79,5 +81,5 @@ Material:
     - _Width: 0.1
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.72794116, g: 1, b: 0.92119676, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
