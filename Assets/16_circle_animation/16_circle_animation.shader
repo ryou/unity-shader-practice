@@ -108,16 +108,16 @@ Shader "16/circle_animation"
                 distanceFromCenter *= 2; // 0 ~ 1
 
                 color.a = 0;
-                if (distanceFromCenter > _Diameter && distanceFromCenter < (_Diameter + _Width))
-                {
-                    float2 coord = uv - 0.5;
-                    float rad = atan2(coord.y, coord.x) + PI;
-                    _Length += sin(_Time.z * _DistortionInterval) * _Distortion;
-                    if (rad < _Length)
-                    {
-                        color.a = 0.45;
-                    }
-                }
+                bool pixelIsWithinCircle = distanceFromCenter > _Diameter && distanceFromCenter < (_Diameter + _Width);
+                if (!pixelIsWithinCircle) discard;
+
+                float2 coord = uv - 0.5;
+                float rad = atan2(coord.y, coord.x) + PI;
+                _Length += sin(_Time.z * _DistortionInterval) * _Distortion;
+                if (rad > _Length) discard;
+
+                color.a = 0.45;
+
 
                 return color;
             }
