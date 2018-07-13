@@ -70,6 +70,7 @@ Shader "16/circle_animation"
             {
                 float2 uv : TEXCOORD0; // テクスチャ座標
                 float4 vertex : SV_POSITION; // クリップスペース位置
+                fixed4 color : COLOR;
             };
 
 
@@ -81,43 +82,35 @@ Shader "16/circle_animation"
             {
                 v2f o;
 
-                // クリップスペースへの変換位置
-                // (モデル*ビュー*プロジェクション行列で乗算)
-                // (SV_POSITION（今回の場合o.vertex）は、fragmentシェーダで使用しない場合でも返り値に含める必要があるっぽい)
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                float rad = atan2(v.vertex.y, v.vertex.x) + PI;
+                _Length += sin(_Time.z * _DistortionInterval) * _Distortion;
+                if (rad > _Length)
+                {
+                    o.color = fixed4(1, 1, 1, 0);
+                }
+                else
+                {
+                    o.color = fixed4(1, 1, 1, 0.45);
+                }
 
                 // 回転を設定
                 float angle = _Time.z * _RotationSpeed;
                 // 回転行列
                 float2x2 rotate = float2x2(cos(angle), -sin(angle), sin(angle), cos(angle));
-                // 回転UVを設定
-                float2 pivot_uv = float2(0.5, 0.5);
-                float2 r = v.texcoord.xy - pivot_uv;
-                o.uv = mul(rotate, r) + pivot_uv;
+                float2 rotateXY = mul(rotate, v.vertex.xy);
+                float3 newVertex = float3(rotateXY, v.vertex.z);
+
+                // クリップスペースへの変換位置
+                // (モデル*ビュー*プロジェクション行列で乗算)
+                // (SV_POSITION（今回の場合o.vertex）は、fragmentシェーダで使用しない場合でも返り値に含める必要があるっぽい)
+                o.vertex = UnityObjectToClipPos(newVertex);
 
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 color = _Color;
-
-                float2 uv = i.uv;
-                // テクスチャの中心からの距離を計算
-                float distanceFromCenter = distance(float2(0.5, 0.5), uv); // 0 ~ 0.5
-                distanceFromCenter *= 2; // 0 ~ 1
-
-                color.a = 0;
-                bool pixelIsWithinCircle = distanceFromCenter > _Diameter && distanceFromCenter < (_Diameter + _Width);
-                if (!pixelIsWithinCircle) discard;
-
-                float2 coord = uv - 0.5;
-                float rad = atan2(coord.y, coord.x) + PI;
-                _Length += sin(_Time.z * _DistortionInterval) * _Distortion;
-                if (rad > _Length) discard;
-
-                color.a = 0.45;
-
+                fixed4 color = _Color * i.color;
 
                 return color;
             }
