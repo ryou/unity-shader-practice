@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "16/circle_animation"
+Shader "16/circle_animation_vertex"
 {
     // Propertiesでは、インスペクタで調整可能な変数の指定を行う
     // https://docs.unity3d.com/jp/current/Manual/SL-Properties.html

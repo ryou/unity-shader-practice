@@ -14,6 +14,8 @@ ModelImporter:
     100012: Circle03
     100014: Circle04
     100016: Circle05
+    100018: Line01
+    100020: Line02
     400000: //RootNode
     400002: Camera
     400004: Circle01
@@ -23,6 +25,8 @@ ModelImporter:
     400012: Circle03
     400014: Circle04
     400016: Circle05
+    400018: Line01
+    400020: Line02
     2000000: Camera
     2100000: No Name
     2300000: //RootNode
@@ -32,6 +36,8 @@ ModelImporter:
     2300008: Circle03
     2300010: Circle04
     2300012: Circle05
+    2300014: Line01
+    2300016: Line02
     3300000: //RootNode
     3300002: Circle01
     3300004: Circle02
@@ -39,6 +45,8 @@ ModelImporter:
     3300008: Circle03
     3300010: Circle04
     3300012: Circle05
+    3300014: Line01
+    3300016: Line02
     4300000: Circle
     4300002: Circle02
     4300004: CircleBase
@@ -46,6 +54,8 @@ ModelImporter:
     4300008: Circle05
     4300010: Circle04
     4300012: Circle03
+    4300014: Line01
+    4300016: Line02
     10800000: Lamp
   externalObjects: {}
   materials:
