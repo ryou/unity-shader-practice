@@ -11,6 +11,14 @@ Shader "16/circle_animation_1pass"
     }
     SubShader
     {
+        Tags
+        {
+            "Queue" = "Transparent"
+            "RenderMode" = "Transparent"
+        }
+        Blend SrcAlpha One
+        ZWrite Off
+
         Pass
         {
             CGPROGRAM
@@ -98,16 +106,75 @@ Shader "16/circle_animation_1pass"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                fixed4 color = fixed4(0, 0, 0, 1);
                 float2 coord = i.uv - 0.5;
 
-                // 回転
-                float rt = _Time.w;
-                float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
-                coord = mul(rotateMatrix, coord);
+                {
+                    // 回転
+                    float rt = _Time.z * 0.79;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
 
-                if (!isInLackedDonut(coord, 0.2, 0.4, 3 + 2*sin(rt))) discard;
+                    if (isInLackedDonut(targetCoord, 0.45, 0.5, 2 + 1.0*sin(_Time.z * 0.79))) color.rgb += _Color.rgb * _Color.a;
+                }
 
-                return _Color;
+                {
+                    // 回転
+                    float rt = _Time.z * -1.0;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.4, 0.5, 3.14 + 1.5*sin(_Time.z * 0.79))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                {
+                    // 回転
+                    float rt = _Time.z * 1.27;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.3, 0.45, 4 + 1.3*sin(_Time.z * 0.8))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                {
+                    // 回転
+                    float rt = _Time.z * 1.9;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.25, 0.35, 2 + 1.0*sin(_Time.z * 1.48))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                {
+                    // 回転
+                    float rt = _Time.z * -1.2;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.225, 0.275, 2.5 + 2.5*sin(_Time.z * 0.4))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                // Line01
+                {
+                    // 回転
+                    float rt = _Time.z * 1.51;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.445, 0.455, 4.0 + 1.0*sin(_Time.z * 1.0))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                // Line02
+                {
+                    // 回転
+                    float rt = _Time.z * 1.0;
+                    float2x2 rotateMatrix = float2x2(cos(rt), -sin(rt), sin(rt), cos(rt));
+                    float2 targetCoord = mul(rotateMatrix, coord);
+
+                    if (isInLackedDonut(targetCoord, 0.395, 0.405, 3.0 + 1.0*sin(_Time.z * 1.0))) color.rgb += _Color.rgb * _Color.a;
+                }
+
+                return color;
             }
             ENDCG
         }
